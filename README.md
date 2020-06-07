@@ -11,6 +11,12 @@ Currently, the following Pure locations are supported:
 * Singapore
 * Shanghai
 
+## Installation
+
+```
+$ pip install pypuregym
+```
+
 ## Documentation
 
 You can read the documentation here.
