@@ -4,6 +4,7 @@ BOOKING_RESPONSE = b"""
 {"error":{"message":"Success","code":200}}
 """
 
+
 def test_book(pure_api, monkeypatch):
     monkeypatch.setattr(
         'requests.sessions.Session.post',
