@@ -25,6 +25,7 @@ setup(
     description="A library to interact with Pure Fitness/Pure Yoga APIs.",
     author='Jeffrey Muller',
     author_email='hello@jeffrey.wtf',
+    url='https://github.com/j-muller/pypuregym',
     packages=find_packages(exclude=['tests', 'tests.*']),
     extras_require={
         'test': [
