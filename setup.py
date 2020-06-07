@@ -24,7 +24,7 @@ setup(
     version=VERSION,
     description="A library to interact with Pure Fitness/Pure Yoga APIs.",
     long_description=read('README.md'),
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown',
     author='Jeffrey Muller',
     author_email='hello@jeffrey.wtf',
     url='https://github.com/j-muller/pypuregym',
