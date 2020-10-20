@@ -5,8 +5,6 @@ import re
 import dateutil.parser
 import requests
 
-from pypuregym.utilities import get_region_id
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,17 +19,10 @@ class PureAPI:
 
         :param username: `str` Pure Fitness/Yoga username.
         :param password: `str` Pure Fitness/Yoga password.
-        :param gym_type: `str` Pure gym type ('fitness' or 'yoga').
-        :param region: `str` Pure region ('HK', 'SG' or 'CN').
+        :param gym_type: `pypuregym.GymType` Pure gym type ('fitness' or
+            'yoga').
+        :param region: `pypuregym.Region` Pure region ('HK', 'SG' or 'CN').
         """
-        assert gym_type in {'fitness', 'yoga'}, (
-            'Gym type "%s" not supported. '
-            'Only "fitness" or "yoga" are supported.' % gym_type)
-
-        assert region in {'HK', 'SG', 'CN'}, (
-            'Region "%s" not supported. '
-            'Only "HK", "SG" and "CN" are supported.' % region)
-
         self._username = username
         self._password = password
 
@@ -53,9 +44,11 @@ class PureAPI:
         """Authenticate on Pure Fitness API.
         """
         if self._gym_type == 'fitness':
-            url = 'https://pure360.pure-fitness.com/en/%s' % self._region
+            url = 'https://pure360.pure-fitness.com/en/%s' % (
+                self._region.name.lower())
         else:
-            url = 'https://pure360.pure-yoga.com/en/%s' % self._region
+            url = 'https://pure360.pure-yoga.com/en/%s' % (
+                self._region.name.lower())
 
         LOGGER.debug('Get token from: %s', url)
 
@@ -69,38 +62,40 @@ class PureAPI:
         assert match, 'Can not find date and token from: %s' % url
 
         match = match.groupdict()
-        url = 'https://pure360-api.pure-international.com/api/v3/login'
-
-        LOGGER.debug('Authenticating as "%s" on: %s', self._username, url)
-        response = self._session.post(
-            url=url,
-            headers={
-                'x-date': match['date'],
-                'x-token': match['token'],
-                'content-type': 'application/json',
-            },
-            data=json.dumps({
-                'username': self._username,
-                'password': self._password,
-                'language_id': 1,
-                'region_id': get_region_id(self._region),
-                'jwt': True,
-                'platform': 'Web',
-            }))
-        response.raise_for_status()
-
-        response = response.json()
-        assert response['error']['code'] == 200, (
-            'Authentication failed: %s' % response['error'])
-
         self._token = match['token']
         self._date = match['date']
-        self._jwt_token = response['data']['user']['jwt']
+
+        if self._username and self._password:
+            url = 'https://pure360-api.pure-international.com/api/v3/login'
+
+            LOGGER.debug('Authenticating as "%s" on: %s', self._username, url)
+            response = self._session.post(
+                url=url,
+                headers={
+                    'x-date': match['date'],
+                    'x-token': match['token'],
+                    'content-type': 'application/json',
+                },
+                data=json.dumps({
+                    'username': self._username,
+                    'password': self._password,
+                    'language_id': 1,
+                    'region_id': self._region.value,
+                    'jwt': True,
+                    'platform': 'Web',
+                }))
+            response.raise_for_status()
+
+            response = response.json()
+            assert response['error']['code'] == 200, (
+                'Authentication failed: %s' % response['error'])
+
+            self._jwt_token = response['data']['user']['jwt']
 
     def get_locations(self):
         """Get Pure studios location.
         """
-        if not self._token or not self._jwt_token or not self._date:
+        if not self._token or not self._date:
             self.authenticate()
 
         LOGGER.debug('Get Pure locations')
@@ -109,9 +104,9 @@ class PureAPI:
         response = self._session.get(
             url=url,
             params={
-                'type': 'F' if self._gym_type == 'fitness' else 'Y',
-                'language_id': 1,
-                'region_id': get_region_id(self._region),
+                'type': self._gym_type.value,
+                'language_id': 1,  # English
+                'region_id': self._region.value,
             },
             headers={
                 'x-date': self._date,
@@ -134,7 +129,7 @@ class PureAPI:
         :param start_date: First date to get the classes for (inclusive).
         :param last_date: Last date to get the classes for (inclusive).
         """
-        if not self._token or not self._jwt_token or not self._date:
+        if not self._token or not self._date:
             self.authenticate()
 
         LOGGER.debug('Getting schedule between %s and %s',
@@ -160,7 +155,7 @@ class PureAPI:
             },
             params={
                 'language_id': '1',
-                'region_id': get_region_id(self._region),
+                'region_id': self._region.value,
                 'location_ids': location_id,
                 'start_date': start_date.strftime('%Y%m%d'),
                 'days': (last_date - start_date).days + 1,
@@ -179,6 +174,9 @@ class PureAPI:
 
         :param class_id: `int` class id to book.
         """
+        if not self._jwt_token:
+            self.authenticate()
+
         LOGGER.debug('Booking class id #%d', class_id)
 
         url = 'https://pure360-api.pure-international.com/api/v3/booking'
@@ -192,12 +190,13 @@ class PureAPI:
             },
             data=json.dumps({
                 'language_id': 1,
-                'region_id': get_region_id(self._region),
+                'region_id': self._region.value,
                 'class_id': class_id,
                 'booked_from': 'WEB',
                 'book_type': 1,
             }),
         )
+        print(response.content)
         response.raise_for_status()
 
         response = response.json()
