@@ -1,3 +1,4 @@
+from pypuregym import GymType
 from .utilities import Response
 
 
@@ -18,6 +19,6 @@ def test_get_locations(pure_api, monkeypatch):
         lambda *args, **kwargs: Response(LOCATION_RESPONSE),
     )
 
-    locations = pure_api.get_locations()
+    locations = pure_api.get_locations(GymType.FITNESS)
     assert len(locations) == 1
     assert locations[0]['id'] == 15

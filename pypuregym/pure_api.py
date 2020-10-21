@@ -14,19 +14,16 @@ class PureAPI:
     """A class to perform queries through Pure Fitness/Yoga API.
     """
 
-    def __init__(self, username, password, gym_type, region):
+    def __init__(self, username, password, region):
         """Create a PureAPI object.
 
         :param username: `str` Pure Fitness/Yoga username.
         :param password: `str` Pure Fitness/Yoga password.
-        :param gym_type: `pypuregym.GymType` Pure gym type ('fitness' or
-            'yoga').
-        :param region: `pypuregym.Region` Pure region ('HK', 'SG' or 'CN').
+        :param region: `pypuregym.Region` Pure region.
         """
         self._username = username
         self._password = password
 
-        self._gym_type = gym_type
         self._region = region
 
         self._jwt_token = None
@@ -43,12 +40,10 @@ class PureAPI:
     def authenticate(self):
         """Authenticate on Pure Fitness API.
         """
-        if self._gym_type == 'fitness':
-            url = 'https://pure360.pure-fitness.com/en/%s' % (
-                self._region.name.lower())
-        else:
-            url = 'https://pure360.pure-yoga.com/en/%s' % (
-                self._region.name.lower())
+        # No matter the gym type and subscription, everybody can log in to Pure
+        # Fitness or (Pure Yoga).
+        url = 'https://pure360.pure-fitness.com/en/%s' % (
+            self._region.name.lower())
 
         LOGGER.debug('Get token from: %s', url)
 
@@ -92,8 +87,10 @@ class PureAPI:
 
             self._jwt_token = response['data']['user']['jwt']
 
-    def get_locations(self):
+    def get_locations(self, gym_type):
         """Get Pure studios location.
+
+        :param gym_type: `pypuregym.GymType` Pure gym type.
         """
         if not self._token or not self._date:
             self.authenticate()
@@ -104,7 +101,7 @@ class PureAPI:
         response = self._session.get(
             url=url,
             params={
-                'type': self._gym_type.value,
+                'type': gym_type.value,
                 'language_id': 1,  # English
                 'region_id': self._region.value,
             },
@@ -196,7 +193,6 @@ class PureAPI:
                 'book_type': 1,
             }),
         )
-        print(response.content)
         response.raise_for_status()
 
         response = response.json()

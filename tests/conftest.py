@@ -1,6 +1,6 @@
 import pytest
 
-from pypuregym import PureAPI
+from pypuregym import PureAPI, Region
 
 
 @pytest.fixture(autouse=True)
@@ -14,8 +14,7 @@ def pure_api():
     api = PureAPI(
         username='john@doe.com',
         password='password123',
-        gym_type='fitness',
-        region='HK',
+        region=Region.HK,
     )
     api._jwt_token = 'jwt-token'
     api._date = 42

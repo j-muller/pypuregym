@@ -30,10 +30,9 @@ def get_location(gym_type, region_id):
     api = PureAPI(
         username=None,
         password=None,
-        gym_type=gym_type,
         region=region,
     )
-    response = api.get_locations()
+    response = api.get_locations(gym_type)
 
     # Format response
     response = [{
@@ -42,6 +41,7 @@ def get_location(gym_type, region_id):
         'Name': entry['short_name']['en'],
         'District': entry['district']['en'],
     } for entry in response]
+
     print(tabulate(
         sorted(response, key=lambda e: e['ID']),
         headers='keys',

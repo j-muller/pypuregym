@@ -1,13 +1,16 @@
+import datetime
 import logging
+import time
 
 from tabulate import tabulate
+import dateutil.parser
 
 from pypuregym import PureAPI, Region
 
 LOGGER = logging.getLogger(__name__)
 
 
-def book_class(region_id, class_id, username, password):
+def book_class(region_id, class_id, username, password, wait_until, retry):
     """Get Pure schedule.
     """
     LOGGER.info('Booking class #%d', class_id)
@@ -24,9 +27,32 @@ def book_class(region_id, class_id, username, password):
     api = PureAPI(
         username=username,
         password=password,
-        gym_type=None,
         region=region,
     )
 
-    response = api.book(class_id=class_id)
-    LOGGER.info('The class has been successfully booked!')
+    if wait_until is not None:
+        wait_until = dateutil.parser.parse(wait_until)
+        now = datetime.datetime.now()
+        delta = wait_until - now
+
+        assert now <= wait_until, (
+            '--wait-until can not be lower than current time')
+
+        LOGGER.info('Wait until %s before booking...', wait_until)
+        time.sleep(delta.seconds)
+
+    retry = int(retry) if retry is not None else 1
+    exception = None
+
+    for _ in range(retry):
+        try:
+            api.book(class_id=class_id)
+            exception = None
+            break
+        except Exception as exc:
+            exception = exc
+
+    if exception is not None:
+        raise exception
+    else:
+        LOGGER.info('The class has been successfully booked!')

@@ -18,7 +18,6 @@ def get_schedule(region_id, location_id, date):
     api = PureAPI(
         username=None,
         password=None,
-        gym_type=None,
         region=region,
     )
     response = api.get_schedule(
