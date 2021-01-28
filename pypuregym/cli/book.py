@@ -2,7 +2,6 @@ import datetime
 import logging
 import time
 
-from tabulate import tabulate
 import dateutil.parser
 
 from pypuregym import PureAPI, Region
@@ -10,6 +9,7 @@ from pypuregym import PureAPI, Region
 LOGGER = logging.getLogger(__name__)
 
 
+# pylint: disable=too-many-arguments
 def book_class(region_id, class_id, username, password, wait_until, retry):
     """Get Pure schedule.
     """
@@ -45,6 +45,7 @@ def book_class(region_id, class_id, username, password, wait_until, retry):
     exception = None
 
     for _ in range(retry):
+        # pylint: disable=broad-except
         try:
             api.book(class_id=class_id)
             exception = None
@@ -54,5 +55,4 @@ def book_class(region_id, class_id, username, password, wait_until, retry):
 
     if exception is not None:
         raise exception
-    else:
-        LOGGER.info('The class has been successfully booked!')
+    LOGGER.info('The class has been successfully booked!')
