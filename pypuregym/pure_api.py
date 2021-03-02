@@ -47,7 +47,7 @@ class PureAPI:
 
         LOGGER.debug('Get token from: %s', url)
 
-        response = self._session.get(url=url)
+        response = self._session.get(url=url, timeout=3)
         response.raise_for_status()
 
         match = re.search(
@@ -66,6 +66,7 @@ class PureAPI:
             LOGGER.debug('Authenticating as "%s" on: %s', self._username, url)
             response = self._session.post(
                 url=url,
+                timeout=3,
                 headers={
                     'x-date': match['date'],
                     'x-token': match['token'],
@@ -100,6 +101,7 @@ class PureAPI:
         url = 'https://pure360-api.pure-international.com/api/v3/view_location'
         response = self._session.get(
             url=url,
+            timeout=3,
             params={
                 'type': gym_type.value,
                 'language_id': 1,  # English
@@ -179,6 +181,7 @@ class PureAPI:
         url = 'https://pure360-api.pure-international.com/api/v3/booking'
         response = self._session.post(
             url=url,
+            timeout=3,
             headers={
                 'x-jwt-token': self._jwt_token,
                 'x-token': self._token,
