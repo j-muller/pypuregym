@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import time
 
 import dateutil.parser
 import requests
@@ -14,12 +15,12 @@ class PureAPI:
     """A class to perform queries through Pure Fitness/Yoga API.
     """
 
-    def __init__(self, username, password, region):
+    def __init__(self, region, username=None, password=None):
         """Create a PureAPI object.
 
+        :param region: `pypuregym.Region` Pure region.
         :param username: `str` Pure Fitness/Yoga username.
         :param password: `str` Pure Fitness/Yoga password.
-        :param region: `pypuregym.Region` Pure region.
         """
         self._username = username
         self._password = password
@@ -51,14 +52,14 @@ class PureAPI:
         response.raise_for_status()
 
         match = re.search(
-            r'"X-Date":(?P<date>\d+)."X-Token":"(?P<token>[a-z0-9]+)"',
+            r"<meta name=\"token\" content=\"(?P<token>[a-z0-9]+)\">",
             response.content.decode('utf-8'),
         )
-        assert match, 'Can not find date and token from: %s' % url
+        assert match, 'Can not find token from: %s' % url
 
         match = match.groupdict()
         self._token = match['token']
-        self._date = match['date']
+        self._date = str(int(time.time()) * 1000)
 
         if self._username and self._password:
             url = 'https://pure360-api.pure-international.com/api/v3/login'
@@ -68,8 +69,8 @@ class PureAPI:
                 url=url,
                 timeout=3,
                 headers={
-                    'x-date': match['date'],
-                    'x-token': match['token'],
+                    'x-date': self._date,
+                    'x-token': self._token,
                     'content-type': 'application/json',
                 },
                 data=json.dumps({
@@ -145,13 +146,17 @@ class PureAPI:
                 last_date, start_date))
 
         url = 'https://pure360-api.pure-international.com/api/v3/view_schedule'
+        headers = {
+            'x-token': self._token,
+            'x-date': self._date,
+        }
+
+        if self._jwt_token:
+            headers['x-jwt-token'] = self._jwt_token
+
         response = self._session.get(
             url=url,
-            headers={
-                'x-jwt-token': self._jwt_token,
-                'x-token': self._token,
-                'x-date': self._date,
-            },
+            headers=headers,
             params={
                 'language_id': '1',
                 'region_id': self._region.value,
