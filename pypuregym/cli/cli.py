@@ -27,36 +27,35 @@ from pypuregym.cli.book import book_class
 
 
 def main():
-    """CLI entry point.
-    """
+    """CLI entry point."""
     args = docopt(__doc__, version=__version__)
 
     logging.basicConfig(
-        format='%(asctime)s - %(levelname)s - %(message)s',
+        format="%(asctime)s - %(levelname)s - %(message)s",
         level=logging.INFO,
     )
 
-    if args['location']:
+    if args["location"]:
         get_location(
-            gym_type=args['<gym-type>'],
-            region_id=args['<region-id>'],
+            gym_type=args["<gym-type>"],
+            region_id=args["<region-id>"],
         )
-    elif args['schedule']:
+    elif args["schedule"]:
         get_schedule(
-            region_id=args['<region-id>'],
-            location_id=int(args['<location-id>']),
-            date=args['<date>'],
+            region_id=args["<region-id>"],
+            location_id=int(args["<location-id>"]),
+            date=args["<date>"],
         )
-    elif args['book']:
+    elif args["book"]:
         book_class(
-            region_id=args['<region-id>'],
-            class_id=int(args['<class-id>']),
-            username=args['<username>'],
-            password=args['<password>'],
-            wait_until=args['--wait-until'],
-            retry=args['--retry'],
+            region_id=args["<region-id>"],
+            class_id=int(args["<class-id>"]),
+            username=args["<username>"],
+            password=args["<password>"],
+            wait_until=args["--wait-until"],
+            retry=args["--retry"],
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

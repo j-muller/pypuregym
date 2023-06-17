@@ -11,18 +11,19 @@ LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=too-many-arguments
 def book_class(region_id, class_id, username, password, wait_until, retry):
-    """Get Pure schedule.
-    """
-    LOGGER.info('Booking class #%d', class_id)
+    """Get Pure schedule."""
+    LOGGER.info("Booking class #%d", class_id)
 
     try:
         region = Region[region_id.upper()]
     except KeyError:
         raise ValueError(
-            '"%s" is not a valid region. Should be one of: %s' % (
+            '"%s" is not a valid region. Should be one of: %s'
+            % (
                 region_id,
-                ', '.join([e.name for e in Region]),
-            )) from None
+                ", ".join([e.name for e in Region]),
+            )
+        ) from None
 
     api = PureAPI(
         username=username,
@@ -35,10 +36,11 @@ def book_class(region_id, class_id, username, password, wait_until, retry):
         now = datetime.datetime.now()
         delta = wait_until - now
 
-        assert now <= wait_until, (
-            '--wait-until can not be lower than current time')
+        assert (
+            now <= wait_until
+        ), "--wait-until can not be lower than current time"
 
-        LOGGER.info('Wait until %s before booking...', wait_until)
+        LOGGER.info("Wait until %s before booking...", wait_until)
         time.sleep(delta.seconds)
 
     retry = int(retry) if retry is not None else 1
@@ -55,4 +57,4 @@ def book_class(region_id, class_id, username, password, wait_until, retry):
 
     if exception is not None:
         raise exception
-    LOGGER.info('The class has been successfully booked!')
+    LOGGER.info("The class has been successfully booked!")

@@ -4,16 +4,17 @@ from pypuregym import PureAPI, Region
 
 
 def get_schedule(region_id, location_id, date):
-    """Get Pure schedule.
-    """
+    """Get Pure schedule."""
     try:
         region = Region[region_id.upper()]
     except KeyError:
         raise ValueError(
-            '"%s" is not a valid region. Should be one of: %s' % (
+            '"%s" is not a valid region. Should be one of: %s'
+            % (
                 region_id,
-                ', '.join([e.name for e in Region]),
-            )) from None
+                ", ".join([e.name for e in Region]),
+            )
+        ) from None
 
     api = PureAPI(
         username=None,
@@ -27,16 +28,21 @@ def get_schedule(region_id, location_id, date):
     )
 
     # Format response
-    response = [{
-        'ID': entry['id'],
-        'Class Name': entry['class_type']['name'],
-        'Teacher': entry['teacher']['name'],
-        'Start Time': entry['start_time'],
-        'End Time': entry['end_time'],
-    } for entry in response]
+    response = [
+        {
+            "ID": entry["id"],
+            "Class Name": entry["class_type"]["name"],
+            "Teacher": entry["teacher"]["name"],
+            "Start Time": entry["start_time"],
+            "End Time": entry["end_time"],
+        }
+        for entry in response
+    ]
 
-    print(tabulate(
-        sorted(response, key=lambda e: e['Start Time']),
-        headers='keys',
-        tablefmt='fancy_grid',
-    ))
+    print(
+        tabulate(
+            sorted(response, key=lambda e: e["Start Time"]),
+            headers="keys",
+            tablefmt="fancy_grid",
+        )
+    )

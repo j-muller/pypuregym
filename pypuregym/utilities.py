@@ -7,10 +7,9 @@ def get_region_id(region):
         - Shanghai/CN -> #4
     """
     regions = {
-        'HK': 1,
-        'SG': 2,
-        'CN': 4,
+        "HK": 1,
+        "SG": 2,
+        "CN": 4,
     }
-    assert region in regions, (
-        'Region "%s" does not exist.' % region)
+    assert region in regions, 'Region "%s" does not exist.' % region
     return regions[region]

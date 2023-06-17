@@ -13,19 +13,23 @@ def get_location(gym_type, region_id):
         region = Region[region_id.upper()]
     except KeyError:
         raise ValueError(
-            '"%s" is not a valid region. Should be one of: %s' % (
+            '"%s" is not a valid region. Should be one of: %s'
+            % (
                 region_id,
-                ', '.join([e.name for e in Region]),
-            )) from None
+                ", ".join([e.name for e in Region]),
+            )
+        ) from None
 
     try:
         gym_type = GymType[gym_type.upper()]
     except KeyError:
         raise ValueError(
-            '"%s" is not a valid gym type. Should be one of: %s' % (
+            '"%s" is not a valid gym type. Should be one of: %s'
+            % (
                 gym_type,
-                ', '.join([e.name for e in GymType]),
-            )) from None
+                ", ".join([e.name for e in GymType]),
+            )
+        ) from None
 
     api = PureAPI(
         username=None,
@@ -35,15 +39,20 @@ def get_location(gym_type, region_id):
     response = api.get_locations(gym_type)
 
     # Format response
-    response = [{
-        'ID': entry['id'],
-        'Code': entry['code'],
-        'Name': entry['short_name']['en'],
-        'District': entry['district']['en'],
-    } for entry in response]
+    response = [
+        {
+            "ID": entry["id"],
+            "Code": entry["code"],
+            "Name": entry["short_name"]["en"],
+            "District": entry["district"]["en"],
+        }
+        for entry in response
+    ]
 
-    print(tabulate(
-        sorted(response, key=lambda e: e['ID']),
-        headers='keys',
-        tablefmt='fancy_grid',
-    ))
+    print(
+        tabulate(
+            sorted(response, key=lambda e: e["ID"]),
+            headers="keys",
+            tablefmt="fancy_grid",
+        )
+    )
