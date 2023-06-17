@@ -81,7 +81,7 @@ dist: ## Create a source distribution
 	$(call START_TARGET,Creating distribution)
 	@$(ENV_RUN) python setup.py --quiet sdist --dist-dir _tmp_dist
 	@mkdir -p dist
-	@mv _tmp_dist/*.tar.gz dist/$(PACKAGE_NAME)-$$(git describe --always).tar.gz
+	@mv _tmp_dist/*.tar.gz dist/$(PACKAGE_NAME)-$$(git describe --tags --always).tar.gz
 	@rm -r _tmp_dist
 	$(call END_TARGET)
 

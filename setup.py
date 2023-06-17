@@ -11,7 +11,7 @@ def read(filename):
 def get_version(package):
     return [
         line for line in read('{}/__init__.py'.format(package)).splitlines()
-        if line.startswith('__version__ = ')][0].split("'")[1]
+        if line.startswith('__version__ = ')][0].split('"')[1]
 
 
 PROJECT_NAME = "pypuregym"
