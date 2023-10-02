@@ -1,7 +1,7 @@
 # pylint: disable=unused-import
 import enum
 
-from pypuregym.pure_api import PureAPI
+from pypuregym.pure_api import PureAPI  # noqa: F401
 
 
 class GymType(enum.Enum):

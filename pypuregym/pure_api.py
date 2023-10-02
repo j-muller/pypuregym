@@ -116,6 +116,7 @@ class PureAPI:
             headers={
                 "x-date": self._date,
                 "x-token": self._token,
+                "x-features": "last_chance_booking",
             },
         )
         response.raise_for_status()
@@ -159,6 +160,7 @@ class PureAPI:
         headers = {
             "x-token": self._token,
             "x-date": self._date,
+            "x-features": "last_chance_booking",
         }
 
         if self._jwt_token:
@@ -171,8 +173,9 @@ class PureAPI:
                 "language_id": "1",
                 "region_id": self._region.value,
                 "location_ids": location_id,
-                "start_date": start_date.strftime("%Y%m%d"),
+                "start_date": start_date.strftime("%Y-%m-%d"),
                 "days": (last_date - start_date).days + 1,
+                "api_version": 3,
             },
         )
         response.raise_for_status()
