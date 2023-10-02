@@ -20,4 +20,4 @@ class Region(enum.Enum):
     CN = 4
 
 
-__version__ = "1.6.0"
+__version__ = "1.7.0"
